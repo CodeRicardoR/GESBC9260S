@@ -1,14 +1,15 @@
 /*
- * CheckDataV6.c
+ * CheckDataV8.c
  *
- *  Created on: Febrery 19, 2020
+ *  Created on: November 02, 2023
  *      Author: Ricardo Rojas Quispe
  *      e-mail: net85.ricardo@gmail.com
  */
 
-/*	
-	Se encarga de supervisar el funcionamiento del programa de 
+/*
+	Se encarga de supervisar el funcionamiento del programa de
 	adquisicion y el archivo de minuto generado en el día.
+	se omite primer caracter enfecha de archivos de minutos.
 */
 #include <stdio.h>   /* Standard input/output definitions */
 #include <stdlib.h>
@@ -47,8 +48,8 @@ static char current_time[250];
 static char string_time[250];
 static char string_time_n[250];
 
-bool TestEnable = false;
-  	
+bool TestEnable = true;
+
 int main(void){
 
 //Declaracion de Variables
@@ -63,7 +64,7 @@ int main(void){
 	char cmd_line[250];
 	char *pointer;
 	int flag_data = 0;
-	
+
 
 	strcpy(fileconf,dirwork);
 	strcat(fileconf,"/setuplog.cfg");
@@ -73,7 +74,7 @@ int main(void){
 	//--------------------------------------
 	strcpy(filelog,dirwork);
 	strcat(filelog,"/statuslog.txt");
-	
+
 	num = current_file();
 	if (num){
 		//Verificacion de la hora, si es 00:00 no hacer nada
@@ -91,14 +92,10 @@ int main(void){
 			return 0;
 		}
 		//Delay de 30 segundos
-		usleep(30000000);		
-		
+		usleep(30000000);
+
 		//Verificacion si esta en ejecucion Magnetometer:
-		f_cmd = popen("ps","r");
-		if (f_cmd == NULL){
-			perror ("No se pudo ejecutar comando : ps");
-			exit (-1);
-		}
+		f_cmd = popen("ps", "r");
 		flag_conta = 0;
 		strcpy(Linepid,"");
 		while(fgets(aux,sizeof(aux),f_cmd) != NULL){
@@ -108,7 +105,7 @@ int main(void){
 				flag_conta = flag_conta + 1;
 				Magnetpid = strtok(Linepid," ");
 				printf("ID PID:%s\n",Magnetpid);
-				break;		
+				break;
 			}
 		}
 		pclose(f_cmd);
@@ -122,113 +119,97 @@ int main(void){
 			//Borramos archivo si existe
 			flag_status = remove(filestatus);
 		}
-		f_status = fopen(filestatus,"w");
+
+		f_status = fopen(filestatus, "w");
 		if(f_status == NULL){
-			f_log = fopen(filelog,"a");
-			if (f_log == NULL)
-				return 0;
-			else{
+			f_log = fopen(filelog, "a");
+			if (f_log != NULL){
 				fprintf(f_log,"  MSG  :  fallo escritura de archivo statusmagnet.txt => ERROR 002.\n");
 				fclose(f_log);
-				return 0;		
-			}			
+			}
 		}else{
 			//Escritura de archivo de statusmagnet.txt
 			fprintf(f_status,"-----------------------------------------------------------------------\n\n");
 			//-----------------------------------------------------------------
 			//Verificacmos existencia de archivo de minutos
-			reset_system = 0;				
-			f_cmd = fopen(filemin,"r");
+			reset_system = 0;
+			f_cmd = fopen(filemin, "r");
 			if (f_cmd == NULL){
 				//Reseteamos sistema
 				reset_system = reset_system + 1;
 				fprintf(f_status,"Current data file  => %s NO EXISTE.\n",filemin);
 				//Escribimos motivo del reset
 				f_log = fopen(filelog,"a");
-				if (f_log == NULL)
-					printf("No se puedo abrir statuslog.txt\n");
-				else{
+				if (f_log != NULL){
 					fprintf(f_log,"  MSG  :  Archivo de minuto no encontrado  en %s\n",current_time);
-					fclose(f_log);		
+					fclose(f_log);
 				}
 			}else{
 				fclose(f_cmd);
 				fprintf(f_status,"Current data file  => %s EXISTE.\n",filemin);
 				//leemos cabecera del archivo:
-				strcpy(cmd_line,"");
-				strcat(cmd_line,"head -n 3 ");
-				strcat(cmd_line,filemin);
-				f_cmd = popen(cmd_line,"r");
-				if (f_cmd == NULL){
-					perror ("No se puede abrir ls -l");
-					exit (-1);
-				}
-				while(fgets(aux,sizeof(aux),f_cmd) != NULL){
-					fprintf(f_status,"%s",aux);
+				strcpy(cmd_line, "");
+				strcat(cmd_line, "head -n 3 ");
+				strcat(cmd_line, filemin);
+				f_cmd = popen(cmd_line, "r");
+				while(fgets(aux, sizeof(aux), f_cmd) != NULL){
+					fprintf(f_status, "%s",aux);
 				}
 				pclose(f_cmd);
-				
+
 				//leemos datos del archivo (5 ultimos):
-				strcpy(cmd_line,"");
-				strcat(cmd_line,"tail -n 5 ");
-				strcat(cmd_line,filemin);
-				f_cmd = popen(cmd_line,"r");
-				if (f_cmd == NULL){
-					perror ("No se puede abrir ls -l");
-					exit (-1);
-				}
+				strcpy(cmd_line, "");
+				strcat(cmd_line, "tail -n 5 ");
+				strcat(cmd_line, filemin);
+				f_cmd = popen(cmd_line, "r");
 				flag_data = 0;
 				while(fgets(aux,sizeof(aux),f_cmd) != NULL){
 					//analisis de la linea de aux => string de datos:
 					// Formato:
 					// 04 03 2015 00 00  -01.4585 +25695.2 +00370.9 +00.8271 +25697.9
-					printf("hora a buscar : %s",string_time_n);
+					printf("hora a buscar : %s", string_time_n);
 					pointer = strstr( aux, string_time_n);
 					if (pointer != NULL){
 						flag_data = flag_data + 1;
-						printf("  ENCONTRADO\n");		
+						printf("  ENCONTRADO\n");
 					}
 					printf("\n");
-					fprintf(f_status,"%s",aux);
+					fprintf(f_status, "%s", aux);
 				}
 				pclose(f_cmd);
 			}
 			//-----------------------------------------------------------------
-			
+
 			//Escribimos informacion de hora:
-			fprintf(f_status,"-----------------------------------------------------------------------\n");
-			fprintf(f_status,"REMOTE SYSTEM TIME => %s\n",current_time);
-		
-			//Escribimos información del pid del proceso 			
+			fprintf(f_status, "-----------------------------------------------------------------------\n");
+			fprintf(f_status, "REMOTE SYSTEM TIME => %s\n",current_time);
+
+			//Escribimos información del pid del proceso
 			if (flag_conta > 0){
-					fprintf(f_status,"PID process        => %s",Linepid);
+					fprintf(f_status, "PID process        => %s", Linepid);
 					fclose(f_status);
 			}else{
-				fprintf(f_status,"PID process        => No found\n");
+				fprintf(f_status, "PID process        => No found\n");
 				fclose(f_status);
 				reset_system = reset_system + 1;
 				//Escribimos motivo del reset
-				f_log = fopen(filelog,"a");
-				if (f_log == NULL)
-					printf("No se puedo abrir statuslog.txt\n");
-				else{
+				f_log = fopen(filelog, "a");
+				if (f_log != NULL){
 					fprintf(f_log,"  MSG  :  Programa de adquisición cerrado  en %s\n",current_time);
-					fclose(f_log);		
+					fclose(f_log);
 				}
 			}
 
 			if (flag_data == 0){
 				reset_system = reset_system + 1;
 				//Escribimos motivo del reset
-				f_log = fopen(filelog,"a");
-				if (f_log == NULL)
-					printf("No se puedo abrir statuslog.txt\n");
-				else{
+				f_log = fopen(filelog, "a");
+				if (f_log != NULL){
 					fprintf(f_log,"  MSG  :  Archivo de minuto no actualizado en %s\n",current_time);
-					fclose(f_log);		
+					fclose(f_log);
 				}
 			}
-				
+
 			if (reset_system == 0){
 				strcpy(cmd_line,"");
 				strcat(cmd_line,"cp /home/magnet/setuplog.cfg /home/www/files/setuplog.txt");
@@ -253,101 +234,60 @@ int main(void){
 			}else{
 				//Reset de sistema
 				f_log = fopen(filelog,"a");
-				if (f_log == NULL)
-					printf("No se puedo abrir statuslog.txt\n");
-				else{
+				if (f_log != NULL){
 					fprintf(f_log,"  MSG  :  Sistema de adquisicion reseteado en %s\n",current_time);
-					fclose(f_log);		
+					fclose(f_log);
 				}
 				//Cerramos Magnetometer
 				if (flag_conta > 0){
-					strcpy(cmd_line,"");
-					strcat(cmd_line,"kill ");
-					strcat(cmd_line,Magnetpid);
-					printf("CMD ejecutando: %s\n",cmd_line);
-					f_cmd = popen(cmd_line,"r");
-					if (f_cmd == NULL){
-						perror ("No se pudo ejecutar comando : kill");
-						exit (-1);
-					}
+					strcpy(cmd_line, "");
+					strcat(cmd_line, "kill ");
+					strcat(cmd_line, Magnetpid);
+					printf("CMD ejecutando: %s\n", cmd_line);
+					f_cmd = popen(cmd_line, "r");
 					while (fgets( cmd_line, sizeof(cmd_line), f_cmd)){
 					}
 					pclose(f_cmd);
 				}
-				//****************************desmontaje de USB	
-				strcpy(cmd_line,"");
-				strcat(cmd_line,"umount ");
+				//desmontaje de USB
+				strcpy(cmd_line, "");
+				strcat(cmd_line, "umount ");
 				strcat(cmd_line, USBdevice);
-				printf("CMD ejecutando: %s\n",cmd_line);
-				f_cmd = popen(cmd_line,"r");
-				if (f_cmd == NULL){
-					//perror ("No se pudo ejecutar comando : %s\n",cmd_line);
-					printf("Failed command %s ---> ERROR:00\n",cmd_line);
-					f_log = fopen(filelog,"a");
-					if(f_log == NULL)
-						printf("No se pudo crear historial.log\n");
-					else{
-						fprintf(f_log,"%cCommand %s umount failed : %c,%s ---> ERROR:\n",34,cmd_line,34,current_time);
-						fclose(f_log);
-					}
-					return 0;//fin de programa
-				}
+				printf("CMD ejecutando: %s\n", cmd_line);
+				f_cmd = popen(cmd_line, "r");
 				while (fgets( cmd_line, sizeof(cmd_line), f_cmd)){
 				}
-				pclose(f_cmd);	
-				//****************************Ejecutando MagnetReset
-				strcpy(cmd_line,"");
-				strcat(cmd_line,"/home/magnet/GPIOreset");
-				printf("CMD ejecutando: %s\n",cmd_line);
+				pclose(f_cmd);
+				//Ejecutando MagnetReset
+				strcpy(cmd_line, "");
+				strcat(cmd_line, "/home/magnet/GPIOreset");
+				printf("CMD ejecutando: %s\n", cmd_line);
+				if(TestEnable){
+                    f_cmd = popen(cmd_line, "r");
+					while (fgets( cmd_line, sizeof(cmd_line), f_cmd)){
+                    }
+                    pclose(f_cmd);
+                }
+				//Apagando sistema embebido
+				printf("Apagando sistema embebido...\n");
+				strcpy(cmd_line, "");
+				strcat(cmd_line, "halt");
 				if(TestEnable){
                     f_cmd = popen(cmd_line,"r");
-                    if (f_cmd == NULL){
-                        perror ("No se pudo ejecutar comando : Magnetreset");
-                        exit (-1);
-                    }
                     while (fgets( cmd_line, sizeof(cmd_line), f_cmd)){
                     }
                     pclose(f_cmd);
                 }
-				//*********************** Apagando sistema embebido
-				printf("Apagando sistema embebido...\n");
-				strcpy(cmd_line,"");
-				strcat(cmd_line,"halt");
-				if(TestEnable){
-                    f_cmd = popen(cmd_line,"r");
-                    if (f_cmd == NULL){
-                        //perror ("No se pudo ejecutar comando : %s\n",cmd_line);
-                        printf("Failed command halt %s ---> ERROR \n",cmd_line);
-                        f_log = fopen(filelog,"a");
-                        if(f_log == NULL)
-                            printf("No se pudo crear historial.log\n");
-                        else{
-                            fprintf(f_log,"%cCommand %s halt failed : %c,%s ---> ERROR:\n",34,cmd_line,34,current_time);
-                            fclose(f_log);
-                        }
-                        return 0;//fin de programa
-                    }
-                    while (fgets( cmd_line, sizeof(cmd_line), f_cmd)){
-                    }
-                    pclose(f_cmd);
-                }	
-				//***********************
-				return 0; //Fin del programa
 			}
 		}
-		return 0;
-
 	}else{
-		f_log = fopen(filelog,"a");
-		if (f_log == NULL)
-			return 0;
-		else{
+		f_log = fopen(filelog, "a");
+		if (f_log != NULL){
 			fprintf(f_log,"  MSG  :  No se pudo leer archivo de configurcion setuplog.cfg => ERROR 001.\n");
 			fclose(f_log);
-			return 0;		
 		}
 	}
-	
+	return 0; //FIN DEL PROGRAMA
 }
 
 
@@ -520,8 +460,3 @@ int current_file(void){
 		return 0;
 	
 }
-
-
-
-
-

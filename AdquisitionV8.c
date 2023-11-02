@@ -831,7 +831,8 @@ FILE *file1, *file2;
 
 					if(timeset == conta_min){
 						if(ss_SYS == 5){
-							//Envio de archivo minm:
+							//-------------------------------------------------------------------------------------
+							//Envio de archivo min-M, server 1:
 							strcpy(cmd_line, "python ");
 							strcat(cmd_line, dirwork);
 							strcat(cmd_line, "/SendfileFTP.py ");
@@ -842,12 +843,30 @@ FILE *file1, *file2;
 							strcat(cmd_line, dirwork);
 							strcat(cmd_line, "/lisn_logon1.txt");
 							strcat(cmd_line, " >/dev/null 2>&1 &");
-							//printf("cmd_line : %s\n",cmd_line);
 							f_temp = popen(cmd_line,"r");
 							while(fgets( cmd_line, sizeof(cmd_line), f_temp)){
 							}
 							pclose(f_temp);
-						
+
+							//Envio de archivo min-M, server 2:
+							strcpy(cmd_line, "python ");
+							strcat(cmd_line, dirwork);
+							strcat(cmd_line, "/SendfileFTP.py ");
+							strcat(cmd_line, pathserver2);
+							strcat(cmd_line, " ");
+							strcat(cmd_line, filesminm);
+							strcat(cmd_line, " ");
+							strcat(cmd_line, dirwork);
+							strcat(cmd_line, "/lisn_logon2.txt");
+							strcat(cmd_line, " >/dev/null 2>&1 &");
+							f_temp = popen(cmd_line,"r");
+							while(fgets( cmd_line, sizeof(cmd_line), f_temp)){
+							}
+							pclose(f_temp);
+							//-------------------------------------------------------------------------------------
+
+							//-------------------------------------------------------------------------------------
+							//Envio de archivo min-V, server 1:
 							strcpy(cmd_line, "python ");
 							strcat(cmd_line, dirwork);
 							strcat(cmd_line, "/SendfileFTP.py ");
@@ -858,12 +877,28 @@ FILE *file1, *file2;
 							strcat(cmd_line, dirwork);
 							strcat(cmd_line, "/lisn_logon1.txt");
 							strcat(cmd_line, " >/dev/null 2>&1 &");
-							//printf("cmd_line : %s\n",cmd_line);
 							f_temp = popen(cmd_line,"r");
 							while(fgets( cmd_line, sizeof(cmd_line), f_temp)){
 							}
 							pclose(f_temp);
-							printf("Minute files FTP sent...\n");
+
+							//Envio de archivo min-V, server 2:
+							strcpy(cmd_line, "python ");
+							strcat(cmd_line, dirwork);
+							strcat(cmd_line, "/SendfileFTP.py ");
+							strcat(cmd_line, pathserver2);
+							strcat(cmd_line, " ");
+							strcat(cmd_line, filesminv);
+							strcat(cmd_line, " ");
+							strcat(cmd_line, dirwork);
+							strcat(cmd_line, "/lisn_logon2.txt");
+							strcat(cmd_line, " >/dev/null 2>&1 &");
+							f_temp = popen(cmd_line,"r");
+							while(fgets( cmd_line, sizeof(cmd_line), f_temp)){
+							}
+							pclose(f_temp);
+							//-------------------------------------------------------------------------------------
+							printf("Minute V-M files FTP sent...\n");
 
 							//Actualizacion de datos setuplog.cfg
 							num = ReadFileConf();
@@ -1206,7 +1241,8 @@ FILE *file1, *file2;
 
 					if(timeset == conta_min){
 						if(ss_SYS == 5){
-							//Envio de archivo minm:
+							//-------------------------------------------------------------------------------------
+							//Envio de archivo min-M, server 1:
 							strcpy(cmd_line, "python ");
 							strcat(cmd_line, dirwork);
 							strcat(cmd_line, "/SendfileFTP.py ");
@@ -1217,12 +1253,30 @@ FILE *file1, *file2;
 							strcat(cmd_line, dirwork);
 							strcat(cmd_line, "/lisn_logon1.txt");
 							strcat(cmd_line, " >/dev/null 2>&1 &");
-							//printf("cmd_line : %s\n", cmd_line);
 							f_temp = popen(cmd_line,"r");
 							while(fgets( cmd_line, sizeof(cmd_line), f_temp)){
 							}
 							pclose(f_temp);
-						
+
+							//Envio de archivo min-M, server 2:
+							strcpy(cmd_line, "python ");
+							strcat(cmd_line, dirwork);
+							strcat(cmd_line, "/SendfileFTP.py ");
+							strcat(cmd_line, pathserver2);
+							strcat(cmd_line, " ");
+							strcat(cmd_line, filesminm);
+							strcat(cmd_line, " ");
+							strcat(cmd_line, dirwork);
+							strcat(cmd_line, "/lisn_logon2.txt");
+							strcat(cmd_line, " >/dev/null 2>&1 &");
+							f_temp = popen(cmd_line,"r");
+							while(fgets( cmd_line, sizeof(cmd_line), f_temp)){
+							}
+							pclose(f_temp);
+							//-------------------------------------------------------------------------------------
+
+							//-------------------------------------------------------------------------------------
+							//Envio de archivo min-V, server 1:
 							strcpy(cmd_line, "python ");
 							strcat(cmd_line, dirwork);
 							strcat(cmd_line, "/SendfileFTP.py ");
@@ -1233,12 +1287,28 @@ FILE *file1, *file2;
 							strcat(cmd_line, dirwork);
 							strcat(cmd_line, "/lisn_logon1.txt");
 							strcat(cmd_line, " >/dev/null 2>&1 &");
-							//printf("cmd_line : %s\n", cmd_line);
 							f_temp = popen(cmd_line,"r");
 							while(fgets( cmd_line, sizeof(cmd_line), f_temp)){
 							}
 							pclose(f_temp);
-							printf("Minute files FTP sent...\n");
+
+							//Envio de archivo min-V, server 2:
+							strcpy(cmd_line, "python ");
+							strcat(cmd_line, dirwork);
+							strcat(cmd_line, "/SendfileFTP.py ");
+							strcat(cmd_line, pathserver2);
+							strcat(cmd_line, " ");
+							strcat(cmd_line, filesminv);
+							strcat(cmd_line, " ");
+							strcat(cmd_line, dirwork);
+							strcat(cmd_line, "/lisn_logon2.txt");
+							strcat(cmd_line, " >/dev/null 2>&1 &");
+							f_temp = popen(cmd_line,"r");
+							while(fgets( cmd_line, sizeof(cmd_line), f_temp)){
+							}
+							pclose(f_temp);
+							//-------------------------------------------------------------------------------------
+							printf("Minute M-V files FTP sent...\n");
 
 							//Actualizacion de datos setuplog.cfg
 							num = ReadFileConf();

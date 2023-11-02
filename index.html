@@ -1,0 +1,53 @@
+<HTML>
+	<HEAD>
+		<TITLE>Magnetometer SBC</TITLE>
+		<LINK rel="shortcut icon" href= "favico.ico"/>
+
+	</HEAD>
+
+	<BODY style="background:#D3D8DD">
+		<CENTER><A href="http://lisn.igp.gob.pe"><IMG src="Logomagnet.jpg" width = 800> </A></CENTER>
+		<!--Mostramos hora y fecha del sistema-->
+		<CENTER>
+		<H2>LOCAL SYSTEM TIME</H2>
+		<FONT color = "#FA320A"><H2><SCRIPT type = "text/javascript">
+			var currentTime = new Date();
+			var month = currentTime.getMonth() + 1;
+			var day = currentTime.getDate();
+			var year = currentTime.getFullYear();
+			var hour = currentTime.getHours();
+			var minute = currentTime.getMinutes();
+			var second = currentTime.getSeconds();
+			
+			if (hour<10) hour="0"+hour;
+			if (minute<10) minute="0"+minute;
+			if (second<10)second="0"+second;
+			if (day<10) day="0"+day;
+			if (month<10) month="0"+month;
+
+			document.write(hour + ":" + minute + ":" + second);
+			document.write(" - " + day + "/" + month + "/" + year );
+
+		</SCRIPT></H2></FONT>
+		</CENTER>		
+		<!--Mostramos información del archivo de configuracion-->
+		<CENTER>
+		<H3>FILE: setup.cfg   (/home/magnet/setup.cfg)</H3>
+		<IFRAME src="/files/setuplog.txt" width=600 height=400 frameborder=1 style="background: #FFFFFF" ></IFRAME>
+		<H3>FILE: fgxfiles.txt   (/mnt/usb_flash/magnet/fgxfile.txt)</H3>
+		<IFRAME src="/files/fgxfiles.txt" width=600 height=150 frameborder=1 style="background: #FFFFFF" ></IFRAME>
+		<H3>FILE: Data minutes (Last five minutes)</H3>
+		<IFRAME src="/files/statusmagnet.txt" width=600 height=240 frameborder=1 style="background: #FFFFFF" ></IFRAME>
+		<BR>
+		<H3>TODAY MAGNETOGRAM</H3>
+		<A href="http://lisn.igp.gob.pe/jdata/realtime/minute/"><IMG src="/files/jica_today.png" width = 800> </A>
+		<H6>COPYRIGHT 2023. ALL RIGHTS ARE RESERVED.</H6>
+		</CENTER>
+		
+
+	</BODY>
+
+
+
+
+</HTML>
